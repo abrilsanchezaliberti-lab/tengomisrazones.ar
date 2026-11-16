@@ -9,21 +9,57 @@
 <meta property="og:description" content="Poemas, cuentos y ensayos de Una tal.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://tengomisrazones.ar/">
+<meta property="og:locale" content="es_AR">
+<meta property="og:image" content="https://tengomisrazones.ar/vista-previa.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Una tal_">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tengomisrazones.ar/vista-previa.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0b0c'/%3E%3Crect x='8' y='22' width='16' height='3' fill='%23f8f8f6'/%3E%3C/svg%3E">
+<script>try { var p0 = localStorage.getItem("paleta"); if (["cafe", "terracota", "rojo", "azul"].indexOf(p0) > -1) document.documentElement.setAttribute("data-paleta", p0); } catch (e) {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800;900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
 <style>
 :root {
   --paper: #f8f8f6; --ink: #0b0b0c; --ink-soft: #5d5d62; --rule: #0b0b0c; --hair: #d4d4d1;
-  --band: #0b0b0c; --band-ink: #f8f8f6;
+  --band: #0b0b0c; --band-ink: #f8f8f6; --accent: #0b0b0c;
   --f-head: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --f-read: "Newsreader", Georgia, "Times New Roman", serif;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root { --paper: #0f0f10; --ink: #f1f1ee; --ink-soft: #9c9ca2; --rule: #f1f1ee; --hair: #34343a; --band: #f1f1ee; --band-ink: #0f0f10; color-scheme: dark; }
+/* Paleta "Café": espresso, eau trouble, bleu porcelaine, nuage de lait. */
+:root[data-paleta="cafe"] {
+  --paper: #f2ede2; --ink: #542916; --ink-soft: #7d5a43; --rule: #542916; --hair: #d9cba9;
+  --band: #88b6ce; --band-ink: #542916; --accent: #b79858;
 }
+/* Paleta "Terracota": #C06225, #9CB9B7, #2E211B, #EAE0C7. */
+:root[data-paleta="terracota"] {
+  --paper: #eae0c7; --ink: #2e211b; --ink-soft: #6b5446; --rule: #2e211b; --hair: #d3c6a6;
+  --band: #9cb9b7; --band-ink: #2e211b; --accent: #c06225;
+}
+/* Paletas vivas: el color va en el título, la franja y los detalles; la lectura queda sobre fondo claro. */
+:root[data-paleta="rojo"] {
+  --paper: #fbf6ef; --ink: #1c1414; --ink-soft: #6a5a57; --rule: #1c1414; --hair: #ead9d2;
+  --band: #e3261e; --band-ink: #fbf6ef; --accent: #e3261e; --mast: #e3261e;
+}
+:root[data-paleta="azul"] {
+  --paper: #f7f8fc; --ink: #0f1538; --ink-soft: #545b7a; --rule: #0f1538; --hair: #d6dbef;
+  --band: #1f45e0; --band-ink: #f7f8fc; --accent: #1f45e0; --mast: #1f45e0;
+}
+.mast { color: var(--mast, var(--ink)); }
+.cursor { color: var(--accent); }
+.paletas { display: inline-flex; align-items: center; gap: 8px; }
+.paletas .lab-p { font-size: 13px; color: var(--ink-soft); }
+.sw { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--ink); padding: 0; cursor: pointer; }
+.sw[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--ink); }
+.sw:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.sw-clasica { background: linear-gradient(90deg, #0b0b0c 0 50%, #f8f8f6 50% 100%); }
+.sw-cafe { background: conic-gradient(#542916 0 25%, #b79858 0 50%, #f2ede2 0 75%, #88b6ce 0); }
+.sw-terracota { background: conic-gradient(#c06225 0 25%, #9cb9b7 0 50%, #eae0c7 0 75%, #2e211b 0); }
+.sw-rojo { background: linear-gradient(90deg, #e3261e 0 60%, #fbf6ef 60% 100%); }
+.sw-azul { background: linear-gradient(90deg, #1f45e0 0 60%, #f7f8fc 60% 100%); }
 * { box-sizing: border-box; }
 html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-head); font-size: 15px; line-height: 1.5; }
@@ -67,6 +103,8 @@ body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(
 aside.side { display: flex; flex-direction: column; gap: 28px; }
 .big { font-weight: 900; font-size: 64px; letter-spacing: -0.045em; line-height: 0.9; font-variant-numeric: tabular-nums; }
 .side .blk { border-top: 1px solid var(--rule); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.bio { font-family: var(--f-read); font-size: 17px; line-height: 1.55; margin: 0; }
+.bio-firma { font-weight: 800; text-transform: uppercase; font-size: 13px; margin: 0; }
 .search { width: 100%; font: inherit; padding: 10px 0; border: 0; border-bottom: 1px solid var(--ink); background: transparent; color: var(--ink); border-radius: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { font: inherit; font-size: 12px; text-transform: uppercase; border: 1px solid var(--ink); background: transparent; color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
@@ -78,8 +116,44 @@ aside.side { display: flex; flex-direction: column; gap: 28px; }
 .article h2 { font-weight: 900; text-transform: uppercase; letter-spacing: -0.04em; line-height: 0.9; font-size: clamp(42px, 8.5vw, 120px); margin: 0 0 32px; text-wrap: balance; overflow-wrap: anywhere; }
 .article .metarow { border-block: 1px solid var(--rule); padding-block: 14px; margin-bottom: 44px; }
 .prose { font-family: var(--f-read); font-size: 20px; line-height: 1.72; max-width: 64ch; margin: 0 auto; white-space: pre-wrap; overflow-wrap: anywhere; }
-.firma { max-width: 64ch; margin: 56px auto 0; padding-top: 18px; border-top: 1px solid var(--rule); font-weight: 800; text-transform: uppercase; font-size: 14px; }
-footer { margin-top: 72px; padding-top: 18px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+.thread { max-width: 74ch; margin: 0 auto; border-top: 1px solid var(--rule); }
+.thread-count { font-weight: 800; text-transform: uppercase; font-size: 12px; margin: 0; padding-block: 12px; border-bottom: 1px solid var(--hair); }
+.mail { padding-block: 24px 30px; border-bottom: 1px solid var(--hair); }
+.mail:last-child { border-bottom: 1px solid var(--rule); }
+.mail-h { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; align-items: center; margin-bottom: 14px; }
+.av { width: 40px; height: 40px; border-radius: 50%; background: var(--ink); color: var(--paper); border: 1px solid var(--ink); display: grid; place-items: center; font-weight: 800; font-size: 16px; }
+.mail.otro .av { background: transparent; color: var(--ink); }
+.mail-who { min-width: 0; font-size: 14px; line-height: 1.35; }
+.mail-who > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mail-who .k { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink-soft); margin-right: 6px; }
+.mail-from { font-weight: 700; }
+.mail-to { color: var(--ink-soft); }
+.mail-date { font-size: 13px; color: var(--ink-soft); white-space: nowrap; font-variant-numeric: tabular-nums; align-self: start; }
+.mail-h { align-items: start; }
+.mail-who .mail-asunto { white-space: normal; font-weight: 600; margin-top: 2px; }
+.mail-subj { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.01em; margin: 0 0 10px 54px; }
+.mail-body { font-family: var(--f-read); font-size: 19px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; margin-left: 54px; }
+@media (max-width: 560px) {
+  .mail-h { grid-template-columns: 34px minmax(0, 1fr); }
+  .av { width: 34px; height: 34px; font-size: 14px; }
+  .mail-date { grid-column: 2; margin-top: -10px; }
+  .mail-subj, .mail-body { margin-left: 0; }
+}
+.firma { max-width: 64ch; margin: 56px auto 0; padding-top: 18px; border-top: 1px solid var(--rule); font-weight: 800; text-transform: uppercase; font-size: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.share { font: inherit; font-size: 13px; font-weight: 600; text-transform: none; cursor: pointer; border: 1px solid var(--ink); border-radius: 999px; padding: 7px 16px; background: transparent; color: var(--ink); max-width: 100%; overflow-wrap: anywhere; }
+.share:hover { background: var(--ink); color: var(--paper); }
+.prevnext { max-width: 64ch; margin: 40px auto 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; border-top: 1px solid var(--rule); padding-top: 18px; }
+.pn { display: flex; flex-direction: column; gap: 4px; min-width: 0; color: var(--ink); text-decoration: none; }
+.pn.der { text-align: right; align-items: flex-end; }
+.pn-k { font-size: 12px; text-transform: uppercase; font-weight: 600; color: var(--ink-soft); }
+.pn-t { font-weight: 800; font-size: 18px; line-height: 1.15; overflow-wrap: anywhere; }
+.pn:hover .pn-t { text-decoration: underline; text-underline-offset: 4px; }
+.contacto { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; }
+.contacto a { color: var(--ink); }
+footer { margin-top: 96px; padding-top: 28px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.despedida { margin: 0; font-family: var(--f-read); font-style: italic; font-size: 17px; color: var(--ink); }
+.despedida span { color: var(--accent); font-weight: 500; }
+.creditos { margin: 0; font-size: 12px; color: var(--ink-soft); letter-spacing: 0.02em; }
 a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 @media (max-width: 860px) {
   .lead { grid-template-columns: minmax(0, 1fr); padding-block: 32px 40px; }
@@ -97,21 +171,60 @@ a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid 
     <a class="brand" href="#">Una tal_</a>
     <nav class="nav" aria-label="Secciones">
       <a href="#">Todas las notas</a>
+      <a href="#sobre">Sobre Una tal_</a>
+      <span class="paletas" role="group" aria-label="Colores">
+        <span class="lab-p">Colores</span>
+        <button class="sw sw-clasica" type="button" data-p="clasica" title="Blanco y negro" aria-label="Blanco y negro"></button>
+        <button class="sw sw-cafe" type="button" data-p="cafe" title="Café" aria-label="Café"></button>
+        <button class="sw sw-terracota" type="button" data-p="terracota" title="Terracota" aria-label="Terracota"></button>
+        <button class="sw sw-rojo" type="button" data-p="rojo" title="Rojo" aria-label="Rojo"></button>
+        <button class="sw sw-azul" type="button" data-p="azul" title="Azul" aria-label="Azul"></button>
+      </span>
       <span class="dash" aria-hidden="true"></span>
       <span id="stats" style="font-variant-numeric:tabular-nums"></span>
     </nav>
   </header>
   <main id="view"></main>
-  <footer><span>Una tal_ · tengomisrazones.ar</span><span id="anio"></span></footer>
+  <footer>
+    <p class="despedida">Gracias por llegar hasta acá. <span>Rarísimo.</span></p>
+    <p class="creditos">Una tal_ · tengomisrazones.ar · <span id="anio"></span></p>
+  </footer>
 </div>
 
-<!-- Las notas. Para actualizar el sitio, se reemplaza solo este bloque. -->
-<script type="application/json" id="notas">[]</script>
+<!-- Las notas (solo las marcadas como públicas). Para actualizar el sitio, se reemplaza solo este bloque. -->
+<script type="application/json" id="notas">[{"id":"8sfi9plwson6irgsrhs2","actualizado":"2026-11-16T18:39:13.672Z","bajada":"JULIÁN LLAMAME","creado":"2026-11-16T18:35:49.108Z","mails":[{"cuerpo":"Necesito que me llames y finjas que pasó algo grave.\n\nEstoy en una cita y el tipo acaba de decir que no cree en los dinosaurios.\n\nNo sé cómo llegamos a este tema.\n\nPor favor llamame.","de":"Clara","fecha":"","para":"Julian"},{"cuerpo":"Pero cree que no existieron o que siguen vivoss?","de":"Julian","fecha":"","para":"Clara"},{"cuerpo":"JULIÁN LLAMAME.","de":"Clara","fecha":"","para":"Julian"},{"cuerpo":"Es importante saberlo.","de":"Julian","fecha":"","para":"Clara"},{"cuerpo":"Dice que los huesos los pusieron los museos.","de":"Clara","fecha":"","para":"Julian"},{"cuerpo":"Quedate un rato más. Quiero saber qué opina de las jirafas.","de":"Julian","fecha":"","para":"Clara"}],"texto":"Necesito que me llames y finjas que pasó algo grave.\n\nEstoy en una cita y el tipo acaba de decir que no cree en los dinosaurios.\n\nNo sé cómo llegamos a este tema.\n\nPor favor llamame.\n\nPero cree que no existieron o que siguen vivoss?\n\nJULIÁN LLAMAME.\n\nEs importante saberlo.\n\nDice que los huesos los pusieron los museos.\n\nQuedate un rato más. Quiero saber qué opina de las jirafas.","tipo":"Mail","titulo":"Urgente"},{"id":"8t2pkbohz35oshrft675","actualizado":"2026-11-16T20:05:10.116Z","bajada":"Las cosas que hacemos juntos","creado":"2026-11-16T20:05:10.116Z","destacada":true,"mails":[{"cuerpo":"No sé por qué te estoy escribiendo si vivimos en la misma casa.\n\nSupongo que porque ayer, cuando intenté explicarte lo que me pasaba, terminamos discutiendo sobre algo que no tenía nada que ver. Vos decías que yo nunca estaba conforme con nada y yo te dije que últimamente me daba la impresión de que hacíamos todo por inercia.\n\nNo quise decir que no te quiero.\n\nPero me preocupa que cada vez que digo que algo de nuestra relación no me gusta, vos entiendas que estoy cuestionando toda nuestra relación.\n\nEl domingo me preguntaste qué quería hacer y te dije que nada. Me dijiste que bueno, que nos quedáramos en casa. Y me enojé.\n\nYa sé. Es bastante difícil convivir conmigo cuando ni siquiera yo sé qué quiero.\n\nPero me parece que hace tiempo dejamos de preguntarnos cosas de verdad. Nos preguntamos qué vamos a comer, si pagamos la luz, si hay ropa para lavar. No sé cuándo fue la última vez que me preguntaste algo que no supieras de mí.\n\nY yo tampoco te pregunto.\n\nNo quiero que me contestes que tenemos que salir más o hacer algún viaje. No estoy hablando de eso.\n\nCreo que me da miedo que nos conozcamos tanto que un día ya no tengamos curiosidad.","de":"Cata","fecha":"","para":"Fran"},{"cuerpo":"\nMe parece injusto que digas que no te pregunto cosas.\n\nEl domingo te pregunté qué querías hacer. Me dijiste que nada. Después te enojaste porque no hice nada.\n\nNo sé qué esperás de mí cuando hacés eso.\n\nY no es que no entienda lo que decís. A mí también me pasa que a veces siento que vivimos repitiendo los mismos días. Pero no creo que eso sea necesariamente malo.\n\nHay algo que me gusta de saber que los jueves llegás tarde y que si te guardo comida te vas a poner contenta. Me gusta no tener que preguntarte todo el tiempo cómo estás para darme cuenta de que tuviste un día de mierda.\n\nA veces pienso que vos confundís la tranquilidad con el aburrimiento.\n\nY que cada tanto necesitás encontrar un problema para comprobar que todavía nos importa resolverlo.\n\nNo sé si es justo que te diga eso, pero es lo que pienso.","de":"Fran","fecha":"","para":"Cata"},{"cuerpo":"Lo leí tres veces.\n\nLa primera me enojé. La segunda también.\n\nLa tercera pensé que quizás tenías razón en algunas cosas.\n\nMe quedé pensando en eso que dijiste de que te gusta saber cómo estoy sin preguntarme. A mí también me gusta que me conozcas. Muchísimo.\n\nPero hay algo que me hace ruido.\n\nPorque a veces no estoy como vos creés que estoy. Y cuando intento explicártelo, siento que tengo que discutir contra una versión de mí que vos ya tenés bastante resuelta.\n\nEl otro día me dijiste que yo siempre necesito tener planes. Lo dijiste como si fuera una característica mía que ya no pudiera cambiar. Como si estuviera condenada a ser la misma persona que era cuando nos conocimos.\n\nY capaz que no quiero hacer nada.\n\nCapaz que quiero aburrirme.\n\nO capaz que quiero aburrirme con vos, pero de otra manera.\n\nNo sé si se entiende.","de":"Cata","fecha":"","para":"Fran"},{"cuerpo":"Se entiende.\n\nAunque hay algo que no te dije.\n\nA veces siento que si no estamos haciendo algo interesante, vos pensás que estamos desperdiciando el tiempo.\n\nY a mí me gusta perder el tiempo con vos.\n\nNo sé cómo explicarlo sin que suene a una de esas frases horribles que ponen en las tazas.\n\nPero me gusta.\n\nAyer, mientras vos estabas escribiendo esto, yo estaba en la cocina esperando que terminara de hervir el agua. Me preguntaste si quería mate. Te dije que sí. Después me contaste una cosa de tu trabajo y te reíste sola antes de terminar de contarla.\n\nNo sé si eso alcanza para lo que vos querés de una pareja.\n\nPara mí, ayer alcanzó.\n\nIgual tenemos que hablar de lo otro. Y comprar yerba.","de":"Fran","fecha":"","para":"Cata"}],"texto":"No sé por qué te estoy escribiendo si vivimos en la misma casa.\n\nSupongo que porque ayer, cuando intenté explicarte lo que me pasaba, terminamos discutiendo sobre algo que no tenía nada que ver. Vos decías que yo nunca estaba conforme con nada y yo te dije que últimamente me daba la impresión de que hacíamos todo por inercia.\n\nNo quise decir que no te quiero.\n\nPero me preocupa que cada vez que digo que algo de nuestra relación no me gusta, vos entiendas que estoy cuestionando toda nuestra relación.\n\nEl domingo me preguntaste qué quería hacer y te dije que nada. Me dijiste que bueno, que nos quedáramos en casa. Y me enojé.\n\nYa sé. Es bastante difícil convivir conmigo cuando ni siquiera yo sé qué quiero.\n\nPero me parece que hace tiempo dejamos de preguntarnos cosas de verdad. Nos preguntamos qué vamos a comer, si pagamos la luz, si hay ropa para lavar. No sé cuándo fue la última vez que me preguntaste algo que no supieras de mí.\n\nY yo tampoco te pregunto.\n\nNo quiero que me contestes que tenemos que salir más o hacer algún viaje. No estoy hablando de eso.\n\nCreo que me da miedo que nos conozcamos tanto que un día ya no tengamos curiosidad.\n\n\nMe parece injusto que digas que no te pregunto cosas.\n\nEl domingo te pregunté qué querías hacer. Me dijiste que nada. Después te enojaste porque no hice nada.\n\nNo sé qué esperás de mí cuando hacés eso.\n\nY no es que no entienda lo que decís. A mí también me pasa que a veces siento que vivimos repitiendo los mismos días. Pero no creo que eso sea necesariamente malo.\n\nHay algo que me gusta de saber que los jueves llegás tarde y que si te guardo comida te vas a poner contenta. Me gusta no tener que preguntarte todo el tiempo cómo estás para darme cuenta de que tuviste un día de mierda.\n\nA veces pienso que vos confundís la tranquilidad con el aburrimiento.\n\nY que cada tanto necesitás encontrar un problema para comprobar que todavía nos importa resolverlo.\n\nNo sé si es justo que te diga eso, pero es lo que pienso.\n\nLo leí tres veces.\n\nLa primera me enojé. La segunda también.\n\nLa tercera pensé que quizás tenías razón en algunas cosas.\n\nMe quedé pensando en eso que dijiste de que te gusta saber cómo estoy sin preguntarme. A mí también me gusta que me conozcas. Muchísimo.\n\nPero hay algo que me hace ruido.\n\nPorque a veces no estoy como vos creés que estoy. Y cuando intento explicártelo, siento que tengo que discutir contra una versión de mí que vos ya tenés bastante resuelta.\n\nEl otro día me dijiste que yo siempre necesito tener planes. Lo dijiste como si fuera una característica mía que ya no pudiera cambiar. Como si estuviera condenada a ser la misma persona que era cuando nos conocimos.\n\nY capaz que no quiero hacer nada.\n\nCapaz que quiero aburrirme.\n\nO capaz que quiero aburrirme con vos, pero de otra manera.\n\nNo sé si se entiende.\n\nSe entiende.\n\nAunque hay algo que no te dije.\n\nA veces siento que si no estamos haciendo algo interesante, vos pensás que estamos desperdiciando el tiempo.\n\nY a mí me gusta perder el tiempo con vos.\n\nNo sé cómo explicarlo sin que suene a una de esas frases horribles que ponen en las tazas.\n\nPero me gusta.\n\nAyer, mientras vos estabas escribiendo esto, yo estaba en la cocina esperando que terminara de hervir el agua. Me preguntaste si quería mate. Te dije que sí. Después me contaste una cosa de tu trabajo y te reíste sola antes de terminar de contarla.\n\nNo sé si eso alcanza para lo que vos querés de una pareja.\n\nPara mí, ayer alcanzó.\n\nIgual tenemos que hablar de lo otro. Y comprar yerba.","tipo":"Mail","titulo":"lo del domingo"},{"id":"jffvshykl3y6t11fvgjx","actualizado":"2026-11-16T19:59:50.732Z","creado":"2026-11-16T19:59:50.732Z","mails":[{"cuerpo":"Se me murió la planta que me diste.\n\nNo sé cómo pasó.\n\nLa regué como me dijiste, la puse cerca de la ventana y hasta le hablé un par de veces porque una compañera del trabajo dice que sirve.\n\nSe murió igual.\n\nMe acordé de que cuando era chica vos tenías plantas por todos lados. En la cocina, en el patio, arriba de la heladera. Algunas las habías sacado de gajos que encontrabas caminando.\n\nYo nunca pude mantener viva ninguna.\n\nTampoco aprendí a coser ni a hacer ese budín de mandarina que preparabas los domingos.\n\nA veces me da un poco de tristeza pensar en todas las cosas que sabés hacer y que yo no aprendí.\n\nEl otro día quise arreglar un botón y terminé llevándolo a una modista.\n\nMe cobró una fortuna. Que hija de puta\n\nMe gustaría que algún día me enseñes a hacer el budín.\n\nLo de las plantas ya lo doy por perdido.","de":"Marina","fecha":"","para":"Mamá"},{"cuerpo":"El budín es de caja.\n\nLe pongo ralladura de mandarina para que parezca casero.\n\nNo le digas a tu hermano.","de":"Mamá","fecha":"","para":"Marina"}],"texto":"Se me murió la planta que me diste.\n\nNo sé cómo pasó.\n\nLa regué como me dijiste, la puse cerca de la ventana y hasta le hablé un par de veces porque una compañera del trabajo dice que sirve.\n\nSe murió igual.\n\nMe acordé de que cuando era chica vos tenías plantas por todos lados. En la cocina, en el patio, arriba de la heladera. Algunas las habías sacado de gajos que encontrabas caminando.\n\nYo nunca pude mantener viva ninguna.\n\nTampoco aprendí a coser ni a hacer ese budín de mandarina que preparabas los domingos.\n\nA veces me da un poco de tristeza pensar en todas las cosas que sabés hacer y que yo no aprendí.\n\nEl otro día quise arreglar un botón y terminé llevándolo a una modista.\n\nMe cobró una fortuna. Que hija de puta\n\nMe gustaría que algún día me enseñes a hacer el budín.\n\nLo de las plantas ya lo doy por perdido.\n\nEl budín es de caja.\n\nLe pongo ralladura de mandarina para que parezca casero.\n\nNo le digas a tu hermano.","tipo":"Mail","titulo":"La planta"}]</script>
 
 <script>
 const NOTAS = (() => { try { return JSON.parse(document.getElementById("notas").textContent); } catch { return []; } })()
   .sort((a, b) => String(b.creado).localeCompare(String(a.creado)));
-const TIPOS = ["Poema", "Cuento", "Ensayo", "Diario", "Carta", "Otro"];
+const BIO = "Escribo cosas. Algunas porque tengo algo para decir, otras porque no sé muy bien qué hacer con lo que pienso. La mayoría empieza en las notas del celular y termina en algún documento que después no encuentro. Así que decidí juntarlas acá. No sé si soluciona algo, pero por lo menos ahora tienen dónde estar.";
+// Estadísticas (GoatCounter). MOSTRAR_LECTURAS: true = los lectores ven "Leída N veces" en cada nota.
+const GOAT = "https://tengomisrazones.goatcounter.com";
+const MOSTRAR_LECTURAS = false;
+const notaPath = (d) => "/nota/" + d.id;
+
+// Cuenta una visita apenas el contador termine de cargar.
+const pendientes = [];
+function contar(path, title) {
+  const fn = () => { try { window.goatcounter.count({ path, title }); } catch {} };
+  if (window.goatcounter && window.goatcounter.count) fn(); else pendientes.push(fn);
+}
+window.gcListo = () => { while (pendientes.length) pendientes.shift()(); };
+
+async function lecturas(d, metaRow) {
+  try {
+    const r = await fetch(GOAT + "/counter/" + encodeURIComponent(notaPath(d)) + ".json");
+    if (!r.ok) return;
+    const { count } = await r.json();
+    if (!count || !metaRow.isConnected) return;
+    const n = String(count).replace(/\D/g, "");
+    metaRow.insertBefore(el("span", {}, el("b", { textContent: "Leída" }), `${count} ${n === "1" ? "vez" : "veces"}`), metaRow.querySelector(".pill"));
+  } catch {}
+}
+
+// Contacto: se muestra solo lo que tenga algo escrito.
+const CONTACTO = { instagram: "demoronada_____", mail: "" };
+const TIPOS = ["Poema", "Cuento", "Ensayo", "Diario", "Carta", "Mail", "Nota del celu", "Mensaje de wpp", "Escuché en la calle", "Leí en algún lado", "Otro"];
 const state = { filtro: "Todos", q: "" };
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const n = document.createElement(tag); for (const [k, v] of Object.entries(props)) { if (k === "style" || k.startsWith("aria-")) n.setAttribute(k, v); else n[k] = v; } for (const k of kids) if (k != null && k !== false) n.append(k); return n; };
@@ -145,7 +258,7 @@ function renderList() {
   const list = $("list"); const items = filtered();
   list.replaceChildren(...items.map(d => el("article", { className: "row" },
     el("div", { className: "num", textContent: pad(NOTAS.length - NOTAS.indexOf(d)) }),
-    el("div", { style: "min-width:0" }, el("h3", {}, el("a", { href: href(d), textContent: d.titulo || "Sin título" })), el("p", { textContent: excerpt(d.texto) }), meta(d)))));
+    el("div", { style: "min-width:0" }, el("h3", {}, el("a", { href: href(d), textContent: d.titulo || "Sin título" })), d.bajada ? el("p", { textContent: d.bajada }) : null, meta(d)))));
   if (!NOTAS.length) list.append(el("div", { className: "note", textContent: "Todavía no hay notas publicadas." }));
   else if (!items.length) list.append(el("div", { className: "note", textContent: "Ninguna nota coincide con esa búsqueda." }));
 }
@@ -153,19 +266,25 @@ function renderList() {
 function renderHome(v) {
   document.title = "Una tal_";
   const kids = [el("h1", { className: "mast" }, "Una tal", el("span", { className: "cursor", textContent: "_" })), ticker()];
-  const lead = NOTAS[0];
+  const lead = NOTAS.find(d => d.destacada) || NOTAS[0];
   kids.push(lead
-    ? el("section", { className: "lead" }, el("h2", {}, el("a", { href: href(lead), textContent: lead.titulo || "Sin título" })), el("div", {}, el("p", { className: "ex", textContent: excerpt(lead.texto, 320) }), meta(lead)))
-    : el("section", { className: "lead" }, el("h2", { textContent: "Tengo mis razones" }), el("div", {}, el("p", { className: "ex", textContent: "Poemas, cuentos y ensayos. Las primeras notas llegan pronto." }))));
+    ? el("section", { className: "lead" }, el("h2", {}, el("a", { href: href(lead), textContent: lead.titulo || "Sin título" })), el("div", {}, lead.bajada ? el("p", { className: "ex", textContent: lead.bajada }) : null, meta(lead)))
+    : el("section", { className: "lead" }, el("h2", { textContent: "Tengo mis razones" }), el("div", {}, el("p", { className: "ex", textContent: "Escribo cosas. Después veo qué hago con ellas." }))));
   const search = el("input", { className: "search", type: "search", placeholder: "Buscar en las notas", value: state.q, "aria-label": "Buscar en las notas" });
   search.oninput = (e) => { state.q = e.target.value; renderList(); };
-  const tipos = ["Todos", ...TIPOS.filter(t => NOTAS.some(d => d.tipo === t))];
+  const tipos = ["Todos", ...new Set([...TIPOS, ...NOTAS.map(d => d.tipo).filter(Boolean)])].filter(t => t === "Todos" || NOTAS.some(d => d.tipo === t));
   const chips = el("div", { className: "chips" }, ...tipos.map(t => {
     const b = el("button", { type: "button", className: "chip", textContent: t, "aria-pressed": String(state.filtro === t) });
     b.onclick = () => { state.filtro = t; chips.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.textContent === t))); renderList(); };
     return b;
   }));
   const side = el("aside", { className: "side" },
+    el("div", { className: "blk", id: "sobre" }, el("p", { className: "sect", textContent: "Sobre Una tal_" }),
+      el("p", { className: "bio", textContent: BIO }), el("p", { className: "bio-firma", textContent: "— Una tal_" })),
+    (CONTACTO.instagram || CONTACTO.mail) ? el("div", { className: "blk", id: "contacto" }, el("p", { className: "sect", textContent: "Escribime" }),
+      el("div", { className: "contacto" },
+        CONTACTO.instagram ? el("a", { href: "https://instagram.com/" + CONTACTO.instagram.replace(/^@/, ""), target: "_blank", rel: "noopener", textContent: "@" + CONTACTO.instagram.replace(/^@/, "") }) : null,
+        CONTACTO.mail ? el("span", { textContent: CONTACTO.mail, style: "user-select:all" }) : null)) : null,
     el("div", { className: "blk" }, el("p", { className: "sect", textContent: "Notas" }), el("div", { className: "big", textContent: `${pad(NOTAS.length)} / ${new Date().getFullYear()}` })),
     NOTAS.length ? el("div", { className: "blk" }, el("p", { className: "sect", textContent: "Buscar" }), search) : null,
     NOTAS.length > 1 ? el("div", { className: "blk" }, el("p", { className: "sect", textContent: "Por tipo" }), chips) : null);
@@ -176,25 +295,81 @@ function renderHome(v) {
 function renderRead(v, d) {
   document.title = (d.titulo || "Sin título") + " — Una tal_";
   const metaRow = meta(d); metaRow.classList.add("metarow");
+  if (MOSTRAR_LECTURAS) lecturas(d, metaRow);
   v.replaceChildren(el("article", { className: "article" },
     el("div", { className: "top" }, el("a", { href: "#", textContent: "← Todas las notas" }), el("span", { className: "pill", textContent: d.tipo || "Otro" })),
     el("h2", { textContent: d.titulo || "Sin título" }), metaRow,
-    el("div", { className: "prose", textContent: d.texto || "" }),
-    el("div", { className: "firma", textContent: "Una tal_" })));
+    isThread(d) ? renderThread(d) : el("div", { className: "prose", textContent: d.texto || "" }),
+    el("div", { className: "firma" }, el("span", { textContent: "Una tal_" }), shareBtn(d)),
+    prevNext(d)));
+}
+
+function shareBtn(d) {
+  const url = location.origin + location.pathname + "#" + encodeURIComponent(d.id);
+  const b = el("button", { type: "button", className: "share", textContent: "Copiar link de esta nota" });
+  b.onclick = async () => {
+    try { await navigator.clipboard.writeText(url); b.textContent = "¡Link copiado!"; }
+    catch { b.textContent = url; }
+    setTimeout(() => { b.textContent = "Copiar link de esta nota"; }, 2500);
+  };
+  return b;
+}
+
+function prevNext(d) {
+  const i = NOTAS.indexOf(d), older = NOTAS[i + 1], newer = NOTAS[i - 1];
+  if (!older && !newer) return null;
+  const cell = (n, label, cls) => n
+    ? el("a", { className: "pn " + cls, href: href(n) }, el("span", { className: "pn-k", textContent: label }), el("span", { className: "pn-t", textContent: n.titulo || "Sin título" }))
+    : el("span");
+  return el("nav", { className: "prevnext", "aria-label": "Otras notas" }, cell(older, "← Nota anterior", "izq"), cell(newer, "Nota siguiente →", "der"));
+}
+
+const isThread = (d) => d.tipo === "Mail" && Array.isArray(d.mails) && d.mails.length > 0;
+function asuntos(base, mails) {
+  const out = []; let prev = (base || "").trim() || "Sin asunto";
+  mails.forEach((m, i) => { const own = typeof m.asunto === "string" && m.asunto.trim(); const s = i === 0 ? prev : (own || "Re: " + prev); out.push(s); prev = s; });
+  return out;
+}
+function renderThread(d) {
+  const first = (d.mails[0]?.de || "").trim();
+  const subs = asuntos(d.titulo, d.mails);
+  return el("div", { className: "thread" },
+    el("p", { className: "thread-count", textContent: `Hilo · ${d.mails.length} ${d.mails.length === 1 ? "mail" : "mails"}` }),
+    ...d.mails.map((m, i) => el("section", { className: "mail" + ((m.de || "").trim() !== first ? " otro" : "") },
+      el("div", { className: "mail-h" },
+        el("span", { className: "av", textContent: ((m.de || "").trim().charAt(0) || "?").toUpperCase(), "aria-hidden": "true" }),
+        el("div", { className: "mail-who" },
+          el("div", { className: "mail-from" }, el("span", { className: "k", textContent: "De:" }), m.de || "Sin remitente"),
+          el("div", { className: "mail-to" }, el("span", { className: "k", textContent: "Para:" }), m.para || "—"),
+          el("div", { className: "mail-asunto" }, el("span", { className: "k", textContent: "Asunto:" }), subs[i])),
+        el("span", { className: "mail-date", textContent: m.fecha || "" })),
+      el("div", { className: "mail-body", textContent: m.cuerpo || "" }))));
 }
 
 function route() {
   const id = decodeURIComponent(location.hash.slice(1));
   const d = id && NOTAS.find(n => n.id === id);
   d ? renderRead($("view"), d) : renderHome($("view"));
-  window.scrollTo({ top: 0 });
+  if (id !== "sobre" || !route.contada) contar(d ? notaPath(d) : "/", d ? (d.titulo || "Sin título") : "Portada");
+  route.contada = true;
+  if (id === "sobre") $("sobre")?.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0 });
 }
 
 const total = NOTAS.reduce((a, d) => a + words(d.texto), 0);
 $("stats").textContent = NOTAS.length ? `${NOTAS.length} ${NOTAS.length === 1 ? "nota" : "notas"} · ${total.toLocaleString("es-AR")} palabras` : "";
 $("anio").textContent = "© " + new Date().getFullYear();
+const PALETAS = ["clasica", "cafe", "terracota", "rojo", "azul"];
+function setPaleta(p) {
+  if (!PALETAS.includes(p)) p = "clasica";
+  if (p === "clasica") document.documentElement.removeAttribute("data-paleta"); else document.documentElement.setAttribute("data-paleta", p);
+  document.querySelectorAll(".sw[data-p]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.p === p)));
+  try { localStorage.setItem("paleta", p); } catch {}
+}
+setPaleta(document.documentElement.getAttribute("data-paleta") || "clasica");
+document.querySelectorAll(".sw[data-p]").forEach(b => b.onclick = () => setPaleta(b.dataset.p));
 window.addEventListener("hashchange", route);
 route();
 </script>
+<script data-goatcounter="https://tengomisrazones.goatcounter.com/count" data-goatcounter-settings='{"no_onload": true}' async src="https://gc.zgo.at/count.js" onload="window.gcListo && window.gcListo()"></script>
 </body>
 </html>
