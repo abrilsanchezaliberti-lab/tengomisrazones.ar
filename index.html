@@ -80,7 +80,9 @@ body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(
 .ticker .run { display: flex; gap: 48px; white-space: nowrap; font-size: 14px; padding-right: 48px; }
 .ticker a { color: inherit; text-decoration: none; }
 .ticker a:hover { text-decoration: underline; }
-@media (prefers-reduced-motion: no-preference) { .ticker .track { animation: slide 40s linear infinite; } @keyframes slide { to { transform: translateX(-50%); } } }
+/* La franja se mueve con JavaScript (anda en iPhone) y también se puede deslizar con el dedo. */
+.ticker .vp { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.ticker .vp::-webkit-scrollbar { display: none; }
 .lead { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px 48px; padding-block: 48px 56px; border-bottom: 1px solid var(--rule); }
 .lead h2 { font-weight: 900; text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.92; font-size: clamp(40px, 6.6vw, 88px); margin: 0; text-wrap: balance; overflow-wrap: anywhere; }
 .lead h2 a { color: inherit; text-decoration: none; }
@@ -140,6 +142,8 @@ aside.side { display: flex; flex-direction: column; gap: 28px; }
   .mail-subj, .mail-body { margin-left: 0; }
 }
 .firma { max-width: 64ch; margin: 56px auto 0; padding-top: 18px; border-top: 1px solid var(--rule); font-weight: 800; text-transform: uppercase; font-size: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.comentarios { max-width: 64ch; margin: 40px auto 0; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--hair); padding-top: 18px; }
+.comentarios .sect { margin: 0; }
 .share { font: inherit; font-size: 13px; font-weight: 600; text-transform: none; cursor: pointer; border: 1px solid var(--ink); border-radius: 999px; padding: 7px 16px; background: transparent; color: var(--ink); max-width: 100%; overflow-wrap: anywhere; }
 .share:hover { background: var(--ink); color: var(--paper); }
 .prevnext { max-width: 64ch; margin: 40px auto 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; border-top: 1px solid var(--rule); padding-top: 18px; }
@@ -148,8 +152,19 @@ aside.side { display: flex; flex-direction: column; gap: 28px; }
 .pn-k { font-size: 12px; text-transform: uppercase; font-weight: 600; color: var(--ink-soft); }
 .pn-t { font-weight: 800; font-size: 18px; line-height: 1.15; overflow-wrap: anywhere; }
 .pn:hover .pn-t { text-decoration: underline; text-underline-offset: 4px; }
-.contacto { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; }
-.contacto a { color: var(--ink); }
+.buzon { display: flex; flex-direction: column; gap: 10px; }
+.b-in { width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; padding: 8px 0; }
+textarea.b-in { font-family: var(--f-read); font-size: 16px; line-height: 1.5; resize: vertical; border: 1px solid var(--hair); padding: 10px; }
+.b-in::placeholder { color: var(--ink-soft); }
+.b-nota { margin: 0; font-size: 13px; color: var(--ink-soft); }
+.b-pie { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.b-estado { margin: 0; font-size: 13px; color: var(--ink-soft); }
+.b-mios { display: flex; flex-direction: column; gap: 8px; }
+.b-mios-t { margin: 6px 0 0; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink-soft); }
+.b-mio { display: flex; flex-direction: column; gap: 2px; font-family: var(--f-read); font-size: 15px; border-left: 2px solid var(--hair); padding-left: 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.b-mio-f { font-family: var(--f-head); font-size: 11px; color: var(--ink-soft); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.share:disabled { opacity: .5; cursor: default; }
 footer { margin-top: 96px; padding-top: 28px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
 .despedida { margin: 0; font-family: var(--f-read); font-style: italic; font-size: 17px; color: var(--ink); }
 .despedida span { color: var(--accent); font-weight: 500; }
@@ -158,11 +173,33 @@ a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid 
 @media (max-width: 860px) {
   .lead { grid-template-columns: minmax(0, 1fr); padding-block: 32px 40px; }
   .cols { grid-template-columns: minmax(0, 1fr); gap: 32px; }
-  aside.side { order: -1; }
+  /* Celu: primero las notas, después la presentación. */
+  aside.side { display: contents; }
+  .blk-buscar { order: 1; } .blk-tipo { order: 2; } .lista { order: 3; }
+  .blk-sobre { order: 4; } .blk-buzon { order: 5; } .blk-cuenta { order: 6; }
+  .side .blk { padding-top: 14px; }
+  .cols { padding-top: 28px; }
+  .side .blk-buscar { border-top: 0; padding-top: 0; }
   .row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .row .num { font-size: 28px; }
   .big { font-size: 48px; }
+  .meta .pill:not(.priv):not(.fija) { display: none; }
+  /* Celu: arriba la marca y los colores; abajo los links. */
+  .bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px 12px; }
+  .nav { display: contents; }
+  .brand { grid-column: 1; grid-row: 1; }
+  .paletas { grid-column: 2; grid-row: 1; gap: 6px; }
+  .paletas .lab-p, .nav .dash, #stats { display: none; }
+  .sw { width: 22px; height: 22px; }
+  .links { grid-column: 1 / -1; grid-row: 2; display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 15px; }
+  .ticker { height: 46px; }
+  .ticker .lab { font-size: 12px; padding-inline: 14px 16px; }
+  .ticker .run { font-size: 13px; gap: 36px; padding-right: 36px; }
 }
+.links { display: contents; }
+@media (max-width: 860px) { .links { display: flex; } }
+/* La franja: que el contenido no se achique, y si el celu pide menos movimiento, se puede deslizar con el dedo. */
+.ticker .track { flex: none; width: max-content; }
 </style>
 </head>
 <body>
@@ -170,8 +207,7 @@ a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid 
   <header class="bar">
     <a class="brand" href="#">Una tal_</a>
     <nav class="nav" aria-label="Secciones">
-      <a href="#">Todas las notas</a>
-      <a href="#sobre">Sobre Una tal_</a>
+      <span class="links"><a href="#">Todas las notas</a><a href="#sobre">Sobre Una tal_</a></span>
       <span class="paletas" role="group" aria-label="Colores">
         <span class="lab-p">Colores</span>
         <button class="sw sw-clasica" type="button" data-p="clasica" title="Blanco y negro" aria-label="Blanco y negro"></button>
@@ -222,9 +258,63 @@ async function lecturas(d, metaRow) {
   } catch {}
 }
 
-// Contacto: se muestra solo lo que tenga algo escrito.
-const CONTACTO = { instagram: "demoronada_____", mail: "" };
-const TIPOS = ["Poema", "Cuento", "Ensayo", "Diario", "Carta", "Mail", "Nota del celu", "Mensaje de wpp", "Escuché en la calle", "Leí en algún lado", "Otro"];
+// Buzón: los mensajes van a un Formulario de Google que solo ve la dueña.
+// Completar con los datos del formulario (form: el código largo; nombre y mensaje: los "entry.123…").
+// nota: el "entry.123…" de la pregunta "Nota" (para los comentarios de cada nota).
+const BUZON = { form: "1FAIpQLSeQgP0rdX97oTdVwgmolqHvK_AD8-YVF3IW7KzVjPMSU_jJ1A", nombre: "entry.599544297", mensaje: "entry.625803803", nota: "entry.254648940" };
+const TIPOS = ["Poema", "Cuento", "Ensayo", "Diario", "Carta", "Mail", "Nota del celu", "Mensaje de wpp", "Escuché en la calle", "Leí en algún lado", "Me escribieron", "Otro"];
+
+const MIS_MSJ = "buzon-mis-mensajes";
+function misMensajes() { try { return JSON.parse(localStorage.getItem(MIS_MSJ) || "[]"); } catch { return []; } }
+
+// Formulario privado. Sin nota: buzón general. Con nota: comentario sobre esa nota.
+function buzonForm(nota) {
+  const notaId = nota ? nota.id : "", notaTit = nota ? (nota.titulo || "Sin título") : "";
+  const nombre = el("input", { type: "text", id: "b-nombre", className: "b-in", placeholder: "Tu nombre (opcional: si no ponés nada, es anónimo)", autocomplete: "off", maxLength: 80 });
+  const msj = el("textarea", { id: "b-msj", className: "b-in", placeholder: nota ? "¿Qué te dejó esta nota?" : "Escribí lo que quieras…", rows: 4, maxLength: 3000 });
+  const estado = el("p", { className: "b-estado", "aria-live": "polite" });
+  const enviar = el("button", { type: "submit", className: "share", textContent: "Enviar" });
+  const mios = el("div", { className: "b-mios" });
+  const pintarMios = () => {
+    const l = misMensajes().filter(m => (m.notaId || "") === notaId);
+    mios.replaceChildren(...(l.length ? [el("p", { className: "b-mios-t", textContent: "Lo que dejaste (solo lo ves vos, en este dispositivo)" }),
+      ...l.slice(-5).reverse().map(m => el("div", { className: "b-mio" }, el("span", { className: "b-mio-f", textContent: fmtFecha(m.fecha) + (m.nombre ? " · " + m.nombre : " · anónimo") }), el("span", { textContent: m.mensaje })))] : []));
+  };
+  const form = el("form", { className: "buzon" },
+    el("label", { htmlFor: "b-nombre", className: "sr", textContent: "Tu nombre (opcional)" }), nombre,
+    el("label", { htmlFor: "b-msj", className: "sr", textContent: "Tu mensaje" }), msj,
+    el("div", { className: "b-pie" }, enviar, estado), mios);
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const texto = msj.value.trim(); if (!texto) { estado.textContent = "Escribí algo antes de enviar."; return; }
+    enviar.disabled = true; estado.textContent = "Enviando…";
+    try {
+      const body = new URLSearchParams(); body.append(BUZON.mensaje, texto); if (BUZON.nombre) body.append(BUZON.nombre, nombre.value.trim());
+      if (BUZON.nota) body.append(BUZON.nota, nota ? notaTit + " (" + location.origin + location.pathname + "#" + notaId + ")" : "Buzón general");
+      await fetch("https://docs.google.com/forms/d/e/" + BUZON.form + "/formResponse", { method: "POST", mode: "no-cors", body });
+      const l = misMensajes(); l.push({ fecha: new Date().toISOString(), nombre: nombre.value.trim(), mensaje: texto, notaId });
+      try { localStorage.setItem(MIS_MSJ, JSON.stringify(l.slice(-20))); } catch {}
+      msj.value = ""; estado.textContent = "Llegó. Gracias."; pintarMios();
+    } catch { estado.textContent = "No se pudo enviar. Revisá la conexión y probá de nuevo."; }
+    enviar.disabled = false;
+  };
+  pintarMios();
+  return form;
+}
+
+function buzonBlock() {
+  if (!BUZON.form || !BUZON.mensaje) return null;
+  return el("div", { className: "blk blk-buzon", id: "buzon" },
+    el("p", { className: "sect", textContent: "Dejame un mensaje" }),
+    el("p", { className: "b-nota", textContent: "Lo leo solo yo. Podés firmarlo o dejarlo anónimo." }), buzonForm(null));
+}
+
+function comentariosBlock(d) {
+  if (!BUZON.form || !BUZON.mensaje) return null;
+  return el("section", { className: "comentarios", "aria-label": "Comentarios" },
+    el("p", { className: "sect", textContent: "Comentarios" }),
+    el("p", { className: "b-nota", textContent: "Lo que escribas acá lo leo solo yo. Podés firmarlo o dejarlo anónimo." }), buzonForm(d));
+}
 const state = { filtro: "Todos", q: "" };
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const n = document.createElement(tag); for (const [k, v] of Object.entries(props)) { if (k === "style" || k.startsWith("aria-")) n.setAttribute(k, v); else n[k] = v; } for (const k of kids) if (k != null && k !== false) n.append(k); return n; };
@@ -246,7 +336,43 @@ function meta(d) {
 function ticker() {
   const items = NOTAS.slice(0, 8);
   const run = () => el("div", { className: "run" }, ...(items.length ? items.map(d => el("a", { href: href(d), textContent: d.titulo || "Sin título" })) : [el("span", { textContent: "Muy pronto, las primeras notas" })]));
-  return el("div", { className: "ticker", "aria-label": "Últimas notas" }, el("span", { className: "lab", textContent: "Últimas notas+++" }), el("div", { className: "track" }, run(), run()));
+  return el("div", { className: "ticker", "aria-label": "Últimas notas" }, el("span", { className: "lab", textContent: "Últimas notas+++" }), el("div", { className: "vp" }, el("div", { className: "track" }, run(), run())));
+}
+
+// Mueve la franja de a poquito. Si alguien la toca o pasa el mouse, se frena y retoma sola.
+function startTicker() {
+  const vp = document.querySelector(".ticker .vp"); if (!vp) return;
+  // Repite los títulos hasta llenar el ancho, así la vuelta no se nota en pantallas grandes.
+  const track = vp.querySelector(".track"), r0 = track && track.children[0];
+  if (r0 && r0.offsetWidth > 0) {
+    const orig = [...r0.children]; let guard = 0;
+    const need = Math.max(vp.clientWidth, window.screen && window.screen.width || 0, window.innerWidth) + 20;
+    while (r0.offsetWidth < need && guard++ < 30) orig.forEach(c => r0.append(c.cloneNode(true)));
+    track.replaceChildren(r0, r0.cloneNode(true));
+  }
+  let pos = 0, paused = false, t;
+  const pause = () => { paused = true; clearTimeout(t); };
+  const resume = () => { clearTimeout(t); t = setTimeout(() => { pos = vp.scrollLeft; paused = false; }, 2500); };
+  vp.addEventListener("touchstart", pause, { passive: true });
+  vp.addEventListener("touchend", resume, { passive: true });
+  vp.addEventListener("mouseenter", pause);
+  vp.addEventListener("mouseleave", resume);
+  vp.addEventListener("wheel", () => { pause(); resume(); }, { passive: true });
+  let last = performance.now();
+  const step = (now) => {
+    if (!vp.isConnected) return;
+    const dt = Math.min(now - last, 64); last = now;
+    const half = vp.scrollWidth / 2;
+    if (!paused && half > vp.clientWidth / 2) {
+      pos += dt * 0.035;
+      if (pos >= half) pos -= half;
+      vp.scrollLeft = pos;
+    } else if (paused && vp.scrollLeft >= half) {
+      vp.scrollLeft -= half;
+    }
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
 function filtered() {
@@ -279,17 +405,14 @@ function renderHome(v) {
     return b;
   }));
   const side = el("aside", { className: "side" },
-    el("div", { className: "blk", id: "sobre" }, el("p", { className: "sect", textContent: "Sobre Una tal_" }),
+    el("div", { className: "blk blk-sobre", id: "sobre" }, el("p", { className: "sect", textContent: "Sobre Una tal_" }),
       el("p", { className: "bio", textContent: BIO }), el("p", { className: "bio-firma", textContent: "— Una tal_" })),
-    (CONTACTO.instagram || CONTACTO.mail) ? el("div", { className: "blk", id: "contacto" }, el("p", { className: "sect", textContent: "Escribime" }),
-      el("div", { className: "contacto" },
-        CONTACTO.instagram ? el("a", { href: "https://instagram.com/" + CONTACTO.instagram.replace(/^@/, ""), target: "_blank", rel: "noopener", textContent: "@" + CONTACTO.instagram.replace(/^@/, "") }) : null,
-        CONTACTO.mail ? el("span", { textContent: CONTACTO.mail, style: "user-select:all" }) : null)) : null,
-    el("div", { className: "blk" }, el("p", { className: "sect", textContent: "Notas" }), el("div", { className: "big", textContent: `${pad(NOTAS.length)} / ${new Date().getFullYear()}` })),
-    NOTAS.length ? el("div", { className: "blk" }, el("p", { className: "sect", textContent: "Buscar" }), search) : null,
-    NOTAS.length > 1 ? el("div", { className: "blk" }, el("p", { className: "sect", textContent: "Por tipo" }), chips) : null);
-  kids.push(el("div", { className: "cols" }, el("section", {}, el("p", { className: "sect", textContent: "Todas las notas" }), el("div", { className: "list", id: "list" })), side));
-  v.replaceChildren(...kids); renderList();
+    buzonBlock(),
+    el("div", { className: "blk blk-cuenta" }, el("p", { className: "sect", textContent: "Notas" }), el("div", { className: "big", textContent: `${pad(NOTAS.length)} / ${new Date().getFullYear()}` })),
+    NOTAS.length ? el("div", { className: "blk blk-buscar" }, el("p", { className: "sect", textContent: "Buscar" }), search) : null,
+    NOTAS.length > 1 && tipos.length > 2 ? el("div", { className: "blk blk-tipo" }, el("p", { className: "sect", textContent: "Por tipo" }), chips) : null);
+  kids.push(el("div", { className: "cols" }, el("section", { className: "lista" }, el("p", { className: "sect", textContent: "Todas las notas" }), el("div", { className: "list", id: "list" })), side));
+  v.replaceChildren(...kids); renderList(); startTicker();
 }
 
 function renderRead(v, d) {
@@ -301,6 +424,7 @@ function renderRead(v, d) {
     el("h2", { textContent: d.titulo || "Sin título" }), metaRow,
     isThread(d) ? renderThread(d) : el("div", { className: "prose", textContent: d.texto || "" }),
     el("div", { className: "firma" }, el("span", { textContent: "Una tal_" }), shareBtn(d)),
+    comentariosBlock(d),
     prevNext(d)));
 }
 
