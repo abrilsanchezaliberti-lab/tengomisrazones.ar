@@ -107,6 +107,12 @@ aside.side { display: flex; flex-direction: column; gap: 28px; }
 .side .blk { border-top: 1px solid var(--rule); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .bio { font-family: var(--f-read); font-size: 17px; line-height: 1.55; margin: 0; }
 .bio-firma { font-weight: 800; text-transform: uppercase; font-size: 13px; margin: 0; }
+.sobre-txt { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+.sobre-txt p { margin: 0; font-family: var(--f-read); font-size: 21px; line-height: 1.6; }
+.sobre-txt p:first-child { font-size: 26px; font-weight: 500; }
+.letra-chica { max-width: 640px; margin: 48px auto 0; font-size: 12px; color: var(--ink-soft); letter-spacing: 0.02em; }
+.sobre .firma { max-width: 640px; }
+.mast a { color: inherit; text-decoration: none; }
 .search { width: 100%; font: inherit; padding: 10px 0; border: 0; border-bottom: 1px solid var(--ink); background: transparent; color: var(--ink); border-radius: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { font: inherit; font-size: 12px; text-transform: uppercase; border: 1px solid var(--ink); background: transparent; color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
@@ -233,7 +239,19 @@ a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid 
 <script>
 const NOTAS = (() => { try { return JSON.parse(document.getElementById("notas").textContent); } catch { return []; } })()
   .sort((a, b) => String(b.creado).localeCompare(String(a.creado)));
-const BIO = "Escribo cosas. Algunas porque tengo algo para decir, otras porque no sé muy bien qué hacer con lo que pienso. La mayoría empieza en las notas del celular y termina en algún documento que después no encuentro. Así que decidí juntarlas acá. No sé si soluciona algo, pero por lo menos ahora tienen dónde estar.";
+const BIO = {
+  titulo: "Y esta quién es?",
+  parrafos: [
+    "Una tal que escribe cosas.",
+    "Algunas porque me pasan, otras porque me hubiera gustado que me pasaran y unas cuantas porque tengo la mala costumbre de pensar demasiado en asuntos que probablemente no lo merezcan.",
+    "Escribo desde hace tiempo. La mayoría de las cosas empiezan en las notas del celular, siguen en algún documento sin título y terminan en un lugar que después no recuerdo. Tengo una cantidad preocupante de archivos que se llaman «final», «final 2» y «ahora sí».",
+    "Así que decidí juntarlos acá. No sé si esto cuenta como poner orden, pero al menos ahora puedo perder todo en un mismo lugar.",
+    "Hay cosas que son ciertas, otras que podrían haberlo sido y algunas que, por el bien de los involucrados, conviene dejar en duda.",
+    "No pretendo tener razón en todo. Aunque, llegado el caso, seguramente encuentre algún argumento.",
+    "En fin, tengo mis razones."
+  ],
+  chica: "Para asuntos importantes, dirigirse a alguien más."
+};
 // Estadísticas (GoatCounter). MOSTRAR_LECTURAS: true = los lectores ven "Leída N veces" en cada nota.
 const GOAT = "https://tengomisrazones.goatcounter.com";
 const MOSTRAR_LECTURAS = false;
@@ -391,7 +409,7 @@ function renderList() {
 
 function renderHome(v) {
   document.title = "Una tal_";
-  const kids = [el("h1", { className: "mast" }, "Una tal", el("span", { className: "cursor", textContent: "_" })), ticker()];
+  const kids = [el("h1", { className: "mast" }, el("a", { href: "#sobre", title: "Y esta quién es?" }, "Una tal", el("span", { className: "cursor", textContent: "_" }))), ticker()];
   const lead = NOTAS.find(d => d.destacada) || NOTAS[0];
   kids.push(lead
     ? el("section", { className: "lead" }, el("h2", {}, el("a", { href: href(lead), textContent: lead.titulo || "Sin título" })), el("div", {}, lead.bajada ? el("p", { className: "ex", textContent: lead.bajada }) : null, meta(lead)))
@@ -405,8 +423,6 @@ function renderHome(v) {
     return b;
   }));
   const side = el("aside", { className: "side" },
-    el("div", { className: "blk blk-sobre", id: "sobre" }, el("p", { className: "sect", textContent: "Sobre Una tal_" }),
-      el("p", { className: "bio", textContent: BIO }), el("p", { className: "bio-firma", textContent: "— Una tal_" })),
     buzonBlock(),
     el("div", { className: "blk blk-cuenta" }, el("p", { className: "sect", textContent: "Notas" }), el("div", { className: "big", textContent: `${pad(NOTAS.length)} / ${new Date().getFullYear()}` })),
     NOTAS.length ? el("div", { className: "blk blk-buscar" }, el("p", { className: "sect", textContent: "Buscar" }), search) : null,
@@ -473,10 +489,20 @@ function renderThread(d) {
 function route() {
   const id = decodeURIComponent(location.hash.slice(1));
   const d = id && NOTAS.find(n => n.id === id);
-  d ? renderRead($("view"), d) : renderHome($("view"));
-  if (id !== "sobre" || !route.contada) contar(d ? notaPath(d) : "/", d ? (d.titulo || "Sin título") : "Portada");
-  route.contada = true;
-  if (id === "sobre") $("sobre")?.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0 });
+  if (id === "sobre") { renderSobre($("view")); contar("/sobre", "Sobre Una tal_"); }
+  else if (d) { renderRead($("view"), d); contar(notaPath(d), d.titulo || "Sin título"); }
+  else { renderHome($("view")); contar("/", "Portada"); }
+  window.scrollTo({ top: 0 });
+}
+
+function renderSobre(v) {
+  document.title = "Sobre Una tal_";
+  v.replaceChildren(el("article", { className: "article sobre" },
+    el("div", { className: "top" }, el("a", { href: "#", textContent: "← Todas las notas" }), el("span", { className: "pill", textContent: "Sobre Una tal_" })),
+    el("h2", { textContent: BIO.titulo }),
+    el("div", { className: "sobre-txt" }, ...BIO.parrafos.map(p => el("p", { textContent: p }))),
+    el("p", { className: "letra-chica", textContent: BIO.chica }),
+    el("div", { className: "firma" }, el("span", { textContent: "— Una tal_" }))));
 }
 
 const total = NOTAS.reduce((a, d) => a + words(d.texto), 0);
