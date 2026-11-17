@@ -120,10 +120,19 @@ aside.side { display: flex; flex-direction: column; gap: 28px; }
 .dest-cat { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); }
 .dest-t { font-weight: 900; text-transform: uppercase; letter-spacing: -0.03em; font-size: clamp(24px, 2.6vw, 34px); line-height: 0.95; overflow-wrap: anywhere; }
 .dest-b { font-family: var(--f-read); font-size: 16px; line-height: 1.5; }
-.azar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding-block: 28px; border-bottom: 1px solid var(--rule); }
-.azar-btn { font: inherit; font-weight: 800; font-size: 18px; text-transform: uppercase; letter-spacing: -0.01em; cursor: pointer; border: 2px solid var(--band); border-radius: 999px; padding: 12px 26px; background: var(--band); color: var(--band-ink); }
+.mast-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 32px; }
+.mast-row .mast { flex: 0 1 auto; font-size: clamp(56px, 12.5vw, 176px); }
+@media (min-width: 861px) { .mast-row { flex-wrap: nowrap; } .azar { flex: none; } }
+.azar { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding-bottom: 26px; }
+.lista-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; }
+.lista-ind { font-size: 13px; color: var(--ink); }
+.lista .chips { margin: 4px 0 14px; }
+.q-top { display: inline-flex; }
+.q-top input { font: inherit; font-size: 14px; width: 150px; padding: 5px 12px; border: 1px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); }
+.q-top input::placeholder { color: var(--ink-soft); }
+.azar-btn { font: inherit; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0; cursor: pointer; border: 2px solid var(--band); border-radius: 999px; padding: 8px 18px; background: var(--band); color: var(--band-ink); white-space: nowrap; }
 .azar-btn:hover { filter: brightness(1.1); }
-.azar-sub { margin: 0; font-family: var(--f-read); font-style: italic; font-size: 17px; color: var(--ink-soft); }
+.azar-sub { margin: 0; font-family: var(--f-read); font-style: italic; font-size: 14px; color: var(--ink-soft); }
 @media (max-width: 860px) {
   .dest-grid { grid-template-columns: minmax(0, 1fr); }
   .dest-card, .dest-card:first-child { border-left: 0; padding: 16px 0 20px; border-top: 1px solid var(--hair); }
@@ -257,7 +266,11 @@ a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid 
   .paletas { grid-column: 2; grid-row: 1; gap: 6px; }
   .paletas .lab-p, .nav .dash, #stats { display: none; }
   .sw { width: 22px; height: 22px; }
-  .links { grid-column: 1 / -1; grid-row: 2; display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 15px; }
+  .links { grid-column: 1; grid-row: 2; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; }
+  .q-top { grid-column: 2; grid-row: 2; }
+  .q-top input { width: 110px; }
+  .mast-row { gap: 0; }
+  .azar { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 0 0 18px; }
   .ticker { height: 46px; }
   .ticker .lab { font-size: 12px; padding-inline: 14px 16px; }
   .ticker .run { font-size: 13px; gap: 36px; padding-right: 36px; }
@@ -274,6 +287,7 @@ a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid 
     <a class="brand" href="#">Una tal_</a>
     <nav class="nav" aria-label="Secciones">
       <span class="links"><a href="#">Portada</a><a href="#indice">Índice</a><a href="#sobre">Sobre Una tal_</a></span>
+      <form class="q-top" role="search" id="q-form"><input id="q-top" type="search" placeholder="Buscar…" aria-label="Buscar en las notas" autocomplete="off"></form>
       <span class="paletas" role="group" aria-label="Colores">
         <span class="lab-p">Colores</span>
         <button class="sw sw-clasica" type="button" data-p="clasica" title="Blanco y negro" aria-label="Blanco y negro"></button>
@@ -447,12 +461,14 @@ const excerpt = (s, n = 230) => { const t = (s || "").replace(/\s+/g, " ").trim(
 const pad = (n) => String(n).padStart(2, "0");
 const href = (d) => "#" + encodeURIComponent(d.id);
 
+// Por ahora la página no muestra fechas. Para volver a mostrarlas: true.
+const MOSTRAR_FECHAS = false;
 function meta(d) {
   return el("div", { className: "meta" },
     el("span", {}, el("b", { textContent: "Categoría" }), d.tipo || "Otro"),
-    d.sinFecha ? null : el("span", {}, el("b", { textContent: "Fecha" }), fmtFecha(d.creado)),
+    MOSTRAR_FECHAS && !d.sinFecha ? el("span", {}, el("b", { textContent: "Fecha" }), fmtFecha(d.creado)) : null,
     el("span", {}, el("b", { textContent: "Lectura" }), mins(d.texto) + " min"),
-    el("span", { className: "pill", textContent: d.tipo || "Otro" }));
+    el("span", { className: "pill", hidden: true }));
 }
 
 function ticker() {
@@ -542,7 +558,8 @@ function renderCategoria(v, s) {
 }
 
 function renderList() {
-  const list = $("list"); const items = filtered();
+  const list = $("list"); if (!list) return; const items = filtered();
+  const t = $("lista-t"); if (t) t.textContent = state.q.trim() ? `Resultados para «${state.q.trim()}»` : "Todas las notas";
   list.replaceChildren(...items.map(filaNota));
   if (!NOTAS.length) list.append(el("div", { className: "note", textContent: "Todavía no hay notas publicadas." }));
   else if (!items.length) list.append(el("div", { className: "note", textContent: "Ninguna nota coincide con esa búsqueda." }));
@@ -550,7 +567,14 @@ function renderList() {
 
 function renderHome(v) {
   document.title = "Una tal_";
-  const kids = [el("h1", { className: "mast" }, el("a", { href: "#sobre", title: "Y esta quién es?" }, "Una tal", el("span", { className: "cursor", textContent: "_" }))), ticker()];
+  const mast = el("h1", { className: "mast" }, el("a", { href: "#sobre", title: "Y esta quién es?" }, "Una tal", el("span", { className: "cursor", textContent: "_" })));
+  let azarBox = null;
+  if (NOTAS.length > 1) {
+    const azar = el("button", { type: "button", className: "azar-btn", textContent: "No sé qué leer →" });
+    azar.onclick = () => { const actual = decodeURIComponent(location.hash.slice(1)); const l = NOTAS.filter(n => n.id !== actual); location.hash = encodeURIComponent(l[Math.floor(Math.random() * l.length)].id); };
+    azarBox = el("div", { className: "azar" }, azar, el("p", { className: "azar-sub", textContent: "Dejá que decida yo, para variar." }));
+  }
+  const kids = [el("div", { className: "mast-row" }, mast, azarBox), ticker()];
   const lead = NOTAS[0];
   kids.push(lead
     ? el("section", { className: "lead" }, el("h2", {}, el("a", { href: href(lead), textContent: lead.titulo || "Sin título" })), el("div", {}, lead.bajada ? el("p", { className: "ex", textContent: lead.bajada }) : null, meta(lead)))
@@ -562,13 +586,6 @@ function renderHome(v) {
       el("span", { className: "dest-cat", textContent: d.tipo || "Otro" }),
       el("span", { className: "dest-t", textContent: d.titulo || "Sin título" }),
       d.bajada ? el("span", { className: "dest-b", textContent: d.bajada }) : null)))));
-  if (NOTAS.length > 1) {
-    const azar = el("button", { type: "button", className: "azar-btn", textContent: "No sé qué leer" });
-    azar.onclick = () => { const actual = decodeURIComponent(location.hash.slice(1)); const l = NOTAS.filter(n => n.id !== actual); location.hash = encodeURIComponent(l[Math.floor(Math.random() * l.length)].id); };
-    kids.push(el("section", { className: "azar" }, azar, el("p", { className: "azar-sub", textContent: "Dejá que decida yo, para variar." })));
-  }
-  const search = el("input", { className: "search", type: "search", placeholder: "Buscar en las notas", value: state.q, "aria-label": "Buscar en las notas" });
-  search.oninput = (e) => { state.q = e.target.value; renderList(); };
   const tipos = ["Todos", ...new Set([...TIPOS, ...NOTAS.map(d => d.tipo).filter(Boolean)])].filter(t => t === "Todos" || NOTAS.some(d => d.tipo === t));
   const chips = el("div", { className: "chips" }, ...tipos.map(t => {
     const b = el("button", { type: "button", className: "chip", textContent: t, "aria-pressed": String(state.filtro === t) });
@@ -577,10 +594,12 @@ function renderHome(v) {
   }));
   const side = el("aside", { className: "side" },
     buzonBlock(),
-    el("div", { className: "blk blk-cuenta" }, el("p", { className: "sect", textContent: "Notas" }), el("div", { className: "big", textContent: `${pad(NOTAS.length)} / ${new Date().getFullYear()}` })),
-    NOTAS.length ? el("div", { className: "blk blk-buscar" }, el("p", { className: "sect", textContent: "Buscar" }), search) : null,
-    NOTAS.length > 1 && tipos.length > 2 ? el("div", { className: "blk blk-tipo" }, el("p", { className: "sect", textContent: "Por tipo" }), chips) : null);
-  kids.push(el("div", { className: "cols" }, el("section", { className: "lista" }, el("p", { className: "sect", textContent: "Todas las notas" }), el("div", { className: "list", id: "list" })), side));
+    el("div", { className: "blk blk-cuenta" }, el("p", { className: "sect", textContent: "Notas" }), el("div", { className: "big", textContent: `${pad(NOTAS.length)} / ${new Date().getFullYear()}` })));
+  const lista = el("section", { className: "lista", id: "lista" },
+    el("div", { className: "lista-h" }, el("p", { className: "sect", id: "lista-t", textContent: "Todas las notas" }), el("a", { className: "lista-ind", href: "#indice", textContent: "Ver por categoría →" })),
+    NOTAS.length > 1 && tipos.length > 2 ? chips : null,
+    el("div", { className: "list", id: "list" }));
+  kids.push(el("div", { className: "cols" }, lista, side));
   v.replaceChildren(...kids); renderList(); startTicker();
 }
 
@@ -679,6 +698,14 @@ function setPaleta(p) {
 }
 setPaleta(document.documentElement.getAttribute("data-paleta") || "clasica");
 document.querySelectorAll(".sw[data-p]").forEach(b => b.onclick = () => setPaleta(b.dataset.p));
+// Buscador de arriba: filtra la lista de la portada (si estás en otra página, te lleva a la portada).
+const enPortada = () => { const h = decodeURIComponent(location.hash.slice(1)); return !h; };
+$("q-top").addEventListener("input", (e) => {
+  state.q = e.target.value;
+  if (!enPortada()) { location.hash = ""; return; }
+  renderList();
+});
+$("q-form").addEventListener("submit", (e) => { e.preventDefault(); if (!enPortada()) location.hash = ""; setTimeout(() => $("lista")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); });
 window.addEventListener("hashchange", route);
 route();
 </script>
