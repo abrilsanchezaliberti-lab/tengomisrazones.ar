@@ -362,6 +362,22 @@ a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid 
 .cita-top { display: flex; justify-content: space-between; align-items: center; }
 .cita-top .sect { margin: 0; }
 .cita-x { background: none; border: 0; font: inherit; font-size: 13px; text-decoration: underline; color: var(--ink); cursor: pointer; }
+/* Pista de "compartí una frase" */
+.pista-capa { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 30; pointer-events: none; transition: opacity .5s; }
+.pista-capa.pista-fuera { opacity: 0; }
+.pista-marca { position: absolute; background: rgba(255, 214, 0, .5); mix-blend-mode: multiply; border-radius: 2px; transform-origin: left center; transform: scaleX(0); animation: pista-marcar .55s ease-out forwards; }
+.pista-tip { display: flex; align-items: center; gap: 12px; }
+.pista-mini { flex: none; width: 54px; height: 96px; display: block; }
+.pista-poster { width: 54px; height: 96px; border-radius: 5px; display: block; box-shadow: 0 6px 14px rgba(0,0,0,.35); opacity: 0; transform: translateY(16px) rotate(-10deg) scale(.8); animation: pista-poster .6s cubic-bezier(.2,.9,.3,1.25) forwards; }
+.pista-txt { display: flex; flex-direction: column; gap: 3px; }
+.pista-txt b { font-weight: 700; }
+.pista-txt span { font-weight: 500; opacity: .8; }
+@keyframes pista-poster { to { opacity: 1; transform: rotate(-4deg); } }
+@media (prefers-reduced-motion: reduce) { .pista-poster { animation: none; opacity: 1; transform: rotate(-4deg); } }
+.pista-tip { position: absolute; pointer-events: auto; width: max-content; max-width: min(340px, calc(100vw - 24px)); text-align: left; font: inherit; font-size: 13px; font-weight: 600; line-height: 1.35; background: var(--ink); color: var(--paper); border: 0; border-radius: 12px; padding: 9px 14px; box-shadow: 0 8px 22px rgba(0,0,0,.22); cursor: pointer; opacity: 0; transform: translateY(6px); animation: pista-aparecer .4s ease-out forwards; }
+@keyframes pista-marcar { to { transform: scaleX(1); } }
+@keyframes pista-aparecer { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pista-marca { transform: none; animation: none; } .pista-tip { animation: none; opacity: 1; transform: none; } }
 .cita-img { width: 100%; max-height: 52vh; object-fit: contain; border-radius: 8px; background: var(--hair); aspect-ratio: 9 / 16; }
 </style>
 </head>
@@ -707,6 +723,7 @@ function renderRead(v, d) {
     relacionadas(d),
     comentariosBlock(d),
     prevNext(d)));
+  setTimeout(pistaFrase, 0);
 }
 
 // "Si te gustó esto, leé…": primero de la misma categoría, después de otras. Cambia según la nota.
@@ -790,8 +807,8 @@ async function imagenFrase(d, frase) {
   const g = c.getContext("2d");
   const cs = getComputedStyle(document.documentElement);
   const col = (v, f) => (cs.getPropertyValue(v) || "").trim() || f;
-  const pal = document.documentElement.getAttribute("data-paleta");
-  const fondo = pal ? col("--band", "#2412b5") : "#2412b5", tinta = pal ? col("--band-ink", "#ffffff") : "#ffffff";
+  // Colores de la paleta que eligió el lector (blanco y negro → fondo negro; azul → azul; rojo → rojo; etc.).
+  const fondo = col("--band", "#0b0b0c"), tinta = col("--band-ink", "#f8f8f6");
   g.fillStyle = fondo; g.fillRect(0, 0, W, H);
   g.fillStyle = tinta; g.textBaseline = "alphabetic";
   const palabras = frase.replace(/\s+/g, " ").trim().split(" ");
@@ -932,6 +949,82 @@ async function abrirCita(d, frase) {
   document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { fuera(); document.removeEventListener("keydown", esc); } });
   document.body.append(fondo);
   try { const b = await imagenHistoria(d, frase); img.src = URL.createObjectURL(b); } catch {}
+}
+
+// Pista (una sola vez por lector): cuando empieza a leer, una frase se marca con resaltador
+// y aparece un cartelito que explica que puede seleccionar frases para compartirlas.
+const TEXTO_NOTA = ".prose, .lib-txt, .mail-body, .rec-p, .burb-t";
+let pistaObs = null;
+function pistaFrase() {
+  let ya = false; try { ya = localStorage.getItem("pista-frase") === "1"; } catch {}
+  if (/[?&#]pista\b/.test(location.search)) ya = false;
+  if (ya) return;
+  const cont = document.querySelector(".article .prose, .article .lib-txt, .article .mail-body, .article .rec-p, .article .burb-t");
+  if (!cont || !("IntersectionObserver" in window)) return;
+  if (pistaObs) pistaObs.disconnect();
+  pistaObs = new IntersectionObserver((ents) => {
+    if (!ents.some(e => e.isIntersecting)) return;
+    pistaObs.disconnect();
+    setTimeout(() => mostrarPista(cont), 1800);
+  }, { threshold: 0.2 });
+  pistaObs.observe(cont);
+}
+function mostrarPista(cont) {
+  if (!cont.isConnected || !popCita.hidden || document.querySelector(".cita-fondo, .pista-capa")) return;
+  const art = cont.closest(".article") || cont;
+  const walker = document.createTreeWalker(art, NodeFilter.SHOW_TEXT);
+  const vh = window.innerHeight;
+  let rango = null;
+  while (!rango && walker.nextNode()) {
+    const n = walker.currentNode;
+    if (!n.parentElement || !n.parentElement.closest(TEXTO_NOTA)) continue;
+    const re = /[^.!?…\n«»"“”]{18,110}[.!?…]/g; let m;
+    while ((m = re.exec(n.data))) {
+      const lead = m[0].length - m[0].trimStart().length;
+      const r = document.createRange(); r.setStart(n, m.index + lead); r.setEnd(n, m.index + m[0].length);
+      const b = r.getBoundingClientRect();
+      if (b.height > 0 && b.top > vh * 0.18 && b.bottom < vh * 0.75) { rango = r; break; }
+    }
+  }
+  if (!rango) {
+    // Ninguna frase a la vista todavía: probar de nuevo cuando la persona siga bajando.
+    const otraVez = () => { window.removeEventListener("scroll", otraVez); setTimeout(() => mostrarPista(cont), 900); };
+    window.addEventListener("scroll", otraVez, { passive: true });
+    return;
+  }
+  try { localStorage.setItem("pista-frase", "1"); } catch {}
+  const rects = [...rango.getClientRects()].filter(rc => rc.width > 2);
+  const capa = el("div", { className: "pista-capa", "aria-hidden": "true" });
+  rects.forEach((rc, i) => capa.append(el("span", { className: "pista-marca",
+    style: `left:${rc.left + scrollX - 2}px;top:${rc.top + scrollY}px;width:${rc.width + 4}px;height:${rc.height}px;animation-delay:${0.15 + i * 0.4}s` })));
+  const ult = rects[rects.length - 1];
+  const tactil = matchMedia("(pointer: coarse)").matches;
+  const frase = rango.toString().replace(/\s+/g, " ").trim();
+  const nota = notaActual;
+  const espera = 0.5 + rects.length * 0.4;
+  const mini = el("span", { className: "pista-mini" });
+  const tip = el("button", { type: "button", className: "pista-tip",
+    style: `left:${Math.max(scrollX + 12, Math.min(ult.left + scrollX, scrollX + window.innerWidth - 352))}px;top:${ult.bottom + scrollY + 12}px;animation-delay:${espera}s` },
+    mini,
+    el("span", { className: "pista-txt" },
+      el("b", { textContent: (tactil ? "Mantené apretada una frase" : "Seleccioná una frase") + " y compartila así" }),
+      el("span", { textContent: "en historias, WhatsApp o X. Tocá para probar." })));
+  capa.append(tip);
+  // La mini imagen es la frase marcada, con los colores de la paleta elegida.
+  if (nota) imagenFrase(nota, frase).then(b => {
+    if (!b || !capa.isConnected) return;
+    const img = el("img", { className: "pista-poster", alt: "" });
+    img.style.animationDelay = (espera + 0.35) + "s";
+    img.src = URL.createObjectURL(b); mini.append(img);
+  }).catch(() => {});
+  document.body.append(capa);
+  const y0 = scrollY;
+  const sacar = () => { window.removeEventListener("scroll", alScroll); window.removeEventListener("resize", sacar); capa.classList.add("pista-fuera"); setTimeout(() => capa.remove(), 600); };
+  const alScroll = () => { if (Math.abs(scrollY - y0) > 220) sacar(); };
+  window.addEventListener("scroll", alScroll, { passive: true });
+  window.addEventListener("resize", sacar);
+  tip.onclick = () => { sacar(); if (nota) abrirCita(nota, frase); };
+  setTimeout(sacar, 9000);
 }
 
 function shareBtn(d) {
