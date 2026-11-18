@@ -966,7 +966,7 @@ function pistaFrase() {
     if (!ents.some(e => e.isIntersecting)) return;
     pistaObs.disconnect();
     setTimeout(() => mostrarPista(cont), 1800);
-  }, { threshold: 0.2 });
+  }, { threshold: 0, rootMargin: "0px 0px -35% 0px" });
   pistaObs.observe(cont);
 }
 function mostrarPista(cont) {
@@ -978,12 +978,15 @@ function mostrarPista(cont) {
   while (!rango && walker.nextNode()) {
     const n = walker.currentNode;
     if (!n.parentElement || !n.parentElement.closest(TEXTO_NOTA)) continue;
-    const re = /[^.!?…\n«»"“”]{18,110}[.!?…]/g; let m;
+    // Frases completas: desde el principio hasta su punto, de largo razonable.
+    const re = /[^.!?…\n]+[.!?…]+/g; let m;
     while ((m = re.exec(n.data))) {
+      const limpio = m[0].trim();
+      if (limpio.length < 12 || limpio.length > 170 || /[«»"“”]/.test(limpio)) continue;
       const lead = m[0].length - m[0].trimStart().length;
       const r = document.createRange(); r.setStart(n, m.index + lead); r.setEnd(n, m.index + m[0].length);
       const b = r.getBoundingClientRect();
-      if (b.height > 0 && b.top > vh * 0.18 && b.bottom < vh * 0.75) { rango = r; break; }
+      if (b.height > 0 && b.top > vh * 0.1 && b.bottom < vh * 0.82) { rango = r; break; }
     }
   }
   if (!rango) {
