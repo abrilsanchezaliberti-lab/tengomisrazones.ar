@@ -951,26 +951,32 @@ async function abrirCita(d, frase) {
   try { const b = await imagenHistoria(d, frase); img.src = URL.createObjectURL(b); } catch {}
 }
 
-// Pista (una sola vez por lector): cuando empieza a leer, una frase se marca con resaltador
+// Pista (cada vez que se abre una nota): cuando empieza a leer, una frase se marca con resaltador
 // y aparece un cartelito que explica que puede seleccionar frases para compartirlas.
 const TEXTO_NOTA = ".prose, .lib-txt, .mail-body, .rec-p, .burb-t";
-let pistaObs = null;
+let pistaTimer = null;
 function pistaFrase() {
-  let ya = false; try { ya = localStorage.getItem("pista-frase") === "1"; } catch {}
-  if (/[?&#]pista\b/.test(location.search)) ya = false;
-  if (ya) return;
-  const cont = document.querySelector(".article .prose, .article .lib-txt, .article .mail-body, .article .rec-p, .article .burb-t");
-  if (!cont || !("IntersectionObserver" in window)) return;
-  if (pistaObs) pistaObs.disconnect();
-  pistaObs = new IntersectionObserver((ents) => {
-    if (!ents.some(e => e.isIntersecting)) return;
-    pistaObs.disconnect();
-    setTimeout(() => mostrarPista(cont), 1800);
-  }, { threshold: 0, rootMargin: "0px 0px -35% 0px" });
-  pistaObs.observe(cont);
+  // Aparece cada vez que se abre una nota, como recordatorio: mientras la persona lee,
+  // cada poquito se fija si hay una frase a la vista y la marca (después de unos segundos de lectura).
+  clearInterval(pistaTimer);
+  const art = document.querySelector(".article");
+  if (!art || !art.querySelector(TEXTO_NOTA)) return;
+  let visible = 0, total = 0, cont = null;
+  pistaTimer = setInterval(() => {
+    total += 600;
+    if (!art.isConnected || total > 120000) { clearInterval(pistaTimer); return; }
+    // En el librito hay páginas escondidas: sirve cualquier pedazo de texto que se esté viendo.
+    cont = [...art.querySelectorAll(TEXTO_NOTA)].find(c => {
+      const b = c.getBoundingClientRect();
+      return b.width > 0 && b.top < window.innerHeight * 0.7 && b.bottom > window.innerHeight * 0.2;
+    }) || null;
+    visible = cont ? visible + 600 : 0;
+    if (visible >= 1800 && mostrarPista(cont)) clearInterval(pistaTimer);
+  }, 600);
 }
 function mostrarPista(cont) {
-  if (!cont.isConnected || !popCita.hidden || document.querySelector(".cita-fondo, .pista-capa")) return;
+  if (!cont.isConnected || !popCita.hidden || document.querySelector(".cita-fondo, .pista-capa")) return false;
+  if (window.getSelection && String(window.getSelection()).trim()) return false;
   const art = cont.closest(".article") || cont;
   const walker = document.createTreeWalker(art, NodeFilter.SHOW_TEXT);
   const vh = window.innerHeight;
@@ -979,7 +985,8 @@ function mostrarPista(cont) {
     const n = walker.currentNode;
     if (!n.parentElement || !n.parentElement.closest(TEXTO_NOTA)) continue;
     // Frases completas: desde el principio hasta su punto, de largo razonable.
-    const re = /[^.!?…\n]+[.!?…]+/g; let m;
+    // En los chats, cada mensaje cuenta como una frase aunque no termine en punto.
+    const re = n.parentElement.closest(".burb-t") ? /[^\n]+/g : /[^.!?…\n]+[.!?…]+/g; let m;
     while ((m = re.exec(n.data))) {
       const limpio = m[0].trim();
       if (limpio.length < 12 || limpio.length > 170 || /[«»"“”]/.test(limpio)) continue;
@@ -989,13 +996,7 @@ function mostrarPista(cont) {
       if (b.height > 0 && b.top > vh * 0.1 && b.bottom < vh * 0.82) { rango = r; break; }
     }
   }
-  if (!rango) {
-    // Ninguna frase a la vista todavía: probar de nuevo cuando la persona siga bajando.
-    const otraVez = () => { window.removeEventListener("scroll", otraVez); setTimeout(() => mostrarPista(cont), 900); };
-    window.addEventListener("scroll", otraVez, { passive: true });
-    return;
-  }
-  try { localStorage.setItem("pista-frase", "1"); } catch {}
+  if (!rango) return false; // ninguna frase a la vista todavía: se vuelve a probar en un ratito
   const rects = [...rango.getClientRects()].filter(rc => rc.width > 2);
   const capa = el("div", { className: "pista-capa", "aria-hidden": "true" });
   rects.forEach((rc, i) => capa.append(el("span", { className: "pista-marca",
@@ -1028,6 +1029,7 @@ function mostrarPista(cont) {
   window.addEventListener("resize", sacar);
   tip.onclick = () => { sacar(); if (nota) abrirCita(nota, frase); };
   setTimeout(sacar, 9000);
+  return true;
 }
 
 function shareBtn(d) {
