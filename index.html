@@ -97,7 +97,7 @@ body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(
 .cols { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 48px; padding-top: 40px; }
 .sect { font-weight: 800; text-transform: uppercase; font-size: 13px; margin: 0 0 6px; }
 .list { display: flex; flex-direction: column; }
-.row { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px 28px; padding-block: 28px; border-top: 1px solid var(--hair); }
+.row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px 28px; padding-block: 28px; border-top: 1px solid var(--hair); }
 .row:first-child { border-top: 1px solid var(--rule); }
 .row .num { font-weight: 900; font-size: 42px; letter-spacing: -0.04em; line-height: 0.9; font-variant-numeric: tabular-nums; }
 .row h3 { font-weight: 800; font-size: clamp(22px, 2.6vw, 32px); letter-spacing: -0.02em; line-height: 1.08; margin: 0 0 10px; text-wrap: balance; }
@@ -401,8 +401,6 @@ a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid 
         <button class="sw sw-rojo" type="button" data-p="rojo" title="Rojo" aria-label="Rojo"></button>
         <button class="sw sw-azul" type="button" data-p="azul" title="Azul" aria-label="Azul"></button>
       </span>
-      <span class="dash" aria-hidden="true"></span>
-      <span id="stats" style="font-variant-numeric:tabular-nums"></span>
     </nav>
   </header>
   <main id="view"></main>
@@ -631,7 +629,6 @@ function filtered() {
 
 function filaNota(d) {
   return el("article", { className: "row" },
-    el("div", { className: "num", textContent: pad(NOTAS.length - NOTAS.indexOf(d)) }),
     el("div", { style: "min-width:0" }, el("h3", {}, el("a", { href: href(d), textContent: d.titulo || "Sin título" })), d.bajada ? el("p", { textContent: d.bajada }) : null, meta(d)));
 }
 
@@ -648,11 +645,11 @@ function renderIndice(v) {
   const cats = categorias();
   const llenas = cats.filter(c => notasDe(c).length);
   v.replaceChildren(el("article", { className: "article indice" },
-    el("div", { className: "top" }, el("a", { href: "#", textContent: "← Portada" }), el("span", { className: "pill", textContent: `${NOTAS.length} ${NOTAS.length === 1 ? "nota" : "notas"} · ${llenas.length} ${llenas.length === 1 ? "categoría" : "categorías"}` })),
+    el("div", { className: "top" }, el("a", { href: "#", textContent: "← Portada" })),
     el("h2", { textContent: "Índice" }),
     el("p", { className: "indice-sub", textContent: "Todo lo que hay, ordenado por categoría. Tocá una para leer solo eso." }),
     el("div", { className: "indice-grid" }, ...llenas.map(c => el("section", { className: "cat" },
-      el("a", { className: "cat-h", href: "#cat-" + slug(c) }, el("span", { className: "cat-n", textContent: c }), el("span", { className: "cat-c", textContent: pad(notasDe(c).length) })),
+      el("a", { className: "cat-h", href: "#cat-" + slug(c) }, el("span", { className: "cat-n", textContent: c })),
       el("ul", { className: "cat-l" }, ...notasDe(c).map(n => el("li", {}, el("a", { href: href(n), textContent: n.titulo || "Sin título" })))))))));
   // Las categorías vacías no se muestran al público: esas las ve solo ella en el cuaderno ("Todavía vacías").
 }
@@ -704,8 +701,7 @@ function renderHome(v) {
     return b;
   }));
   const side = el("aside", { className: "side" },
-    buzonBlock(),
-    el("div", { className: "blk blk-cuenta" }, el("p", { className: "sect", textContent: "Notas" }), el("div", { className: "big", textContent: pad(NOTAS.length) })));
+    buzonBlock());
   const lista = el("section", { className: "lista", id: "lista" },
     el("div", { className: "lista-h" }, el("p", { className: "sect", id: "lista-t", textContent: "Todas las notas" }), el("a", { className: "lista-ind", href: "#indice", textContent: "Ver por categoría →" })),
     NOTAS.length > 1 && tipos.length > 2 ? chips : null,
@@ -1258,8 +1254,7 @@ function renderSobre(v) {
     el("p", { className: "letra-chica", textContent: BIO.chica })));
 }
 
-const total = NOTAS.reduce((a, d) => a + words(d.texto), 0);
-$("stats").textContent = NOTAS.length ? `${NOTAS.length} ${NOTAS.length === 1 ? "nota" : "notas"} · ${total.toLocaleString("es-AR")} palabras` : "";
+// La cantidad de notas no se muestra en ningún lado de la página pública (decisión de ella).
 $("anio").textContent = "© " + new Date().getFullYear();
 const PALETAS = ["clasica", "cafe", "terracota", "rojo", "azul"];
 function setPaleta(p) {
